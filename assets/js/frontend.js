@@ -21,7 +21,8 @@
         airport: {
             heathrow: 35,     // £17.50 each way
             stansted: 40,     // £20 each way
-            luton:    57      // £28.50 each way
+            luton:    57,     // £28.50 each way
+            gatwick: 57      // £28.50 each way
         }
     };
 
@@ -245,12 +246,13 @@
         var sameAddr      = true;
 
         var delivIsAirport = false;
-        var delivAirport   = '';      // 'heathrow' | 'stansted' | 'luton'
+        var delivAirport   = '';
         var delivAddrOk    = false;   // true when address OR airport confirmed
 
-        var collIsAirport  = false;
-        var collAirport    = '';
-        var collAddrOk     = true;    // starts true because same-addr is checked
+        var collIsAirport      = false;
+        var collAirport        = '';
+        var collShowroomPickup = false;
+        var collAddrOk         = true;    // starts true because same-addr is checked
 
         /* ── Address widgets ────────────────────────────────────────────────── */
         var delivState = addressWidget({
@@ -303,6 +305,8 @@
                 collAddrOk    = false;
                 collIsAirport = false;
                 collAirport   = '';
+                collShowroomPickup = false;
+                $wrap.find('#lc-collect-showroom').prop('checked', false);
                 $wrap.find('[name="coll_is_airport"][value="no"]').prop('checked', true);
                 $wrap.find('#lc-coll-airport-picker').hide();
                 $wrap.find('#lc-coll-addr-search').show();
@@ -329,6 +333,24 @@
             collAddrOk  = !!collAirport;
             $wrap.find('#lc-hidden-coll-airport').val(collAirport || 'none');
             $wrap.find('#lc-coll-airport-ok').toggle(collAddrOk);
+            checkStep1();
+        });
+
+        $wrap.find('#lc-collect-showroom').on('change', function () {
+            collShowroomPickup = $(this).is(':checked');
+            if (collShowroomPickup) {
+                collAddrOk = true;
+                collIsAirport = false;
+                collAirport = '';
+                $wrap.find('[name="coll_is_airport"][value="no"]').prop('checked', true);
+                $wrap.find('#lc-coll-airport-picker').hide();
+                $wrap.find('#lc-coll-addr-search').hide();
+                $wrap.find('[name="coll_airport_name"]').prop('checked', false);
+                $wrap.find('#lc-hidden-coll-airport').val('none');
+            } else {
+                $wrap.find('#lc-coll-addr-search').show();
+                collAddrOk = false;
+            }
             checkStep1();
         });
 
@@ -385,7 +407,11 @@
         }
 
         function checkStep2() {
-            $wrap.find('#lc-btn-step2').prop('disabled', !(pickupDate && delivTime));
+            var ready = !!(pickupDate && delivTime);
+            $wrap.find('#lc-btn-step2').prop('disabled', !ready);
+            if (ready) {
+                $wrap.find('#lc-step-3').removeClass('lc-step--locked');
+            }
         }
 
         $wrap.find('#lc-btn-step2').on('click', function () {
@@ -436,7 +462,14 @@
 
         function checkStep3() {
             var days = dropoffDate ? daysBetween(pickupDate, dropoffDate) : 0;
-            $wrap.find('#lc-btn-step3').prop('disabled', !(dropoffDate && collTime && days > 0));
+            var ready = !!(dropoffDate && collTime && days > 0);
+            $wrap.find('#lc-btn-step3').prop('disabled', !ready);
+            if (ready) {
+                buildSummary(function () {
+                    $wrap.find('#lc-step-4').removeClass('lc-step--locked');
+                    $wrap.find('#lc-actions').fadeIn(200);
+                });
+            }
         }
 
         $wrap.find('#lc-btn-step3').on('click', function () {
@@ -457,11 +490,20 @@
             var effDA = delivIsAirport ? delivAirport : '';
             var effCA = sameAddr ? effDA : (collIsAirport ? collAirport : '');
 
-            var fBase  = PRICE.base;
+            var legDeliveryBase   = 50;
+            var legCollectionBase = 50;
+            var fBase  = legDeliveryBase + legCollectionBase;
             var fDOOH  = dOOH ? PRICE.ooh_delivery   : 0;
             var fCOOH  = cOOH ? PRICE.ooh_collection  : 0;
             var fDAP   = effDA ? (PRICE.airport[effDA] || 0) : 0;
             var fCAP   = effCA ? (PRICE.airport[effCA] || 0) : 0;
+
+            if (effDA && !effCA) {
+                fDAP = fDAP / 2;
+            } else if (!effDA && effCA) {
+                fCAP = fCAP / 2;
+            }
+
             var totalFee = fBase + fDOOH + fCOOH + fDAP + fCAP;
 
             $.post(lendocareData.ajax_url, {
@@ -479,16 +521,16 @@
                 appendRow($t, 'Rental charge', d.rental_price_f + ' <small>(' + d.billing_unit + ')</small>');
                 appendRow($t, 'Base delivery & collection', gbp(fBase));
 
-                if (fDOOH) appendSub($t, 'Out-of-hours surcharge (delivery)',   gbp(fDOOH));
-                if (fCOOH) appendSub($t, 'Out-of-hours surcharge (collection)', gbp(fCOOH));
+                if (fDOOH) appendSub($t, 'Out-of-hours extra charge (delivery)',   gbp(fDOOH));
+                if (fCOOH) appendSub($t, 'Out-of-hours extra charge (collection)', gbp(fCOOH));
 
                 if (fDAP) {
-                    var dapLbl = ucfirst(effDA) + ' airport surcharge';
+                    var dapLbl = ucfirst(effDA) + ' airport extra charge';
                     dapLbl += sameAddr ? ' (delivery + collection)' : ' (delivery)';
                     appendSub($t, dapLbl, gbp(fDAP));
                 }
                 if (fCAP && !sameAddr) {
-                    appendSub($t, ucfirst(effCA) + ' airport surcharge (collection)', gbp(fCAP));
+                    appendSub($t, ucfirst(effCA) + ' airport extra charge (collection)', gbp(fCAP));
                 }
 
                 if (d.deposit > 0) appendRow($t, 'Security deposit (refundable)', d.deposit_f);
@@ -524,18 +566,28 @@
             var cOOH  = isOOH(dropoffDate, collTime);
             var effDA = delivIsAirport ? delivAirport : '';
             var effCA = sameAddr ? effDA : (collIsAirport ? collAirport : '');
+
+            var deliveryAirportFee   = effDA ? (PRICE.airport[effDA] || 0) : 0;
+            var collectionAirportFee = effCA ? (PRICE.airport[effCA] || 0) : 0;
+            if (effDA && !effCA) {
+                deliveryAirportFee = deliveryAirportFee / 2;
+            } else if (!effDA && effCA) {
+                collectionAirportFee = collectionAirportFee / 2;
+            }
+
             var fee   = PRICE.base
                       + (dOOH ? PRICE.ooh_delivery   : 0)
                       + (cOOH ? PRICE.ooh_collection  : 0)
-                      + (effDA ? (PRICE.airport[effDA] || 0) : 0)
-                      + (effCA ? (PRICE.airport[effCA] || 0) : 0);
+                      + deliveryAirportFee
+                      + collectionAirportFee;
 
             var delivLabel = delivIsAirport
                 ? ucfirst(delivAirport) + ' Airport'
                 : (delivState.label || $wrap.find('#lc-input-delivery').val());
             var collLabel  = sameAddr ? delivLabel
+                : (collShowroomPickup ? 'Unit 7, Firmdale Village, Ryan Dr, Brentford, TW8 9ZB'
                 : (collIsAirport ? ucfirst(collAirport) + ' Airport'
-                                 : (collState.label || $wrap.find('#lc-input-collection').val()));
+                                 : (collState.label || $wrap.find('#lc-input-collection').val())));
 
             var $btn = $wrap.find('.lc-btn-book');
             $btn.prop('disabled', true);
@@ -585,9 +637,9 @@
         function renderTimeBadge($el, dateStr, timeStr, oohFee) {
             if (!dateStr || !timeStr) { $el.html(''); return; }
             if (isOOH(dateStr, timeStr)) {
-                $el.html('<span class="lc-badge lc-badge--ooh">\uD83C\uDF19 Out-of-hours \u2014 +' + gbp(oohFee) + ' surcharge</span>');
+                $el.html('<span class="lc-badge lc-badge--ooh">\uD83C\uDF19 Out-of-hours \u2014 +' + gbp(oohFee) + ' extra charge</span>');
             } else {
-                $el.html('<span class="lc-badge lc-badge--std">\u2600\uFE0F Standard hours \u2014 no surcharge</span>');
+                $el.html('<span class="lc-badge lc-badge--std">\u2600\uFE0F Standard hours \u2014 no extra charge</span>');
             }
         }
 
