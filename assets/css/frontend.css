@@ -3,7 +3,11 @@
 /* ── Wrapper ──────────────────────────────────────────────────────────────── */
 .lendocare-booking-form-wrap {
     font-family: inherit;
+<<<<<<< codex/make-changes-to-the-plugin-vbq760
     max-width: 680px;
+=======
+    max-width: 620px;
+>>>>>>> main
     margin: 1.5rem 0;
 }
 
@@ -55,9 +59,14 @@
     padding: 0.55rem 0.65rem;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
+<<<<<<< codex/make-changes-to-the-plugin-vbq760
     background: #fff;
     margin-bottom: 0.55rem !important;
     line-height: 1.35;
+=======
+    background: #f8fafc;
+    margin-bottom: 0.75rem !important;
+>>>>>>> main
 }
 
 

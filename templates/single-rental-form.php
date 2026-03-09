@@ -162,6 +162,12 @@ $time_options = '
                         Collection from our showroom (Unit 7, Firmdale Village, Ryan Dr, Brentford, TW8 9ZB)
                     </label>
 
+                    <label class="lc-checkbox-label lc-showroom-toggle" style="margin-bottom:0.75rem;">
+                        <input type="checkbox" id="lc-collect-showroom" name="collect_showroom" value="1">
+                        <span class="lc-checkbox-box"></span>
+                        Collection from our showroom (Unit 7, Firmdale Village, Ryan Dr, Brentford, TW8 9ZB)
+                    </label>
+
                     <!-- Q: Is it an airport? -->
                     <div class="lc-question-row" id="lc-coll-airport-question">
                         <span class="lc-question-text">Is this collection from an airport?</span>

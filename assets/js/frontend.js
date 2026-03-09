@@ -537,7 +537,11 @@
                 fCAP = fCAP / 2;
             }
 
+<<<<<<< codex/make-changes-to-the-plugin-vbq760
             var totalFee = fBase + fDOOH + fCOOH + fDSD + fDAP + fCAP;
+=======
+            var totalFee = fBase + fDOOH + fCOOH + fDAP + fCAP;
+>>>>>>> main
 
             $.post(lendocareData.ajax_url, {
                 action:       'lendocare_calculate_price',
@@ -556,7 +560,10 @@
 
                 if (fDOOH) appendSub($t, 'Out-of-hours extra charge (delivery)',   gbp(fDOOH));
                 if (fCOOH) appendSub($t, 'Out-of-hours extra charge (collection)', gbp(fCOOH));
+<<<<<<< codex/make-changes-to-the-plugin-vbq760
                 if (fDSD) appendSub($t, 'Same-day extra charge (delivery showroom)', gbp(fDSD));
+=======
+>>>>>>> main
 
                 if (fDAP) {
                     var dapLbl = ucfirst(effDA) + ' airport extra charge';
@@ -609,12 +616,18 @@
                 collectionAirportFee = collectionAirportFee / 2;
             }
 
+<<<<<<< codex/make-changes-to-the-plugin-vbq760
             var deliverySameDayFee = (!dOOH && isSameDay(pickupDate) && delivShowroomPickup) ? PRICE.ooh_delivery : 0;
 
             var fee   = PRICE.base
                       + (dOOH ? PRICE.ooh_delivery   : 0)
                       + (cOOH ? PRICE.ooh_collection  : 0)
                       + deliverySameDayFee
+=======
+            var fee   = PRICE.base
+                      + (dOOH ? PRICE.ooh_delivery   : 0)
+                      + (cOOH ? PRICE.ooh_collection  : 0)
+>>>>>>> main
                       + deliveryAirportFee
                       + collectionAirportFee;
 
@@ -675,11 +688,16 @@
             if (!dateStr || !timeStr) { $el.html(''); return; }
             if (isOOH(dateStr, timeStr)) {
                 $el.html('<span class="lc-badge lc-badge--ooh">\uD83C\uDF19 Out-of-hours \u2014 +' + gbp(oohFee) + ' extra charge</span>');
+<<<<<<< codex/make-changes-to-the-plugin-vbq760
                 return;
             }
             if (allowSameDayShowroomFee && showroomSelected && isSameDay(dateStr)) {
                 $el.html('<span class="lc-badge lc-badge--ooh">\u26A1 Same-day ' + legLabel + ' from showroom \u2014 +' + gbp(oohFee) + ' extra charge</span>');
                 return;
+=======
+            } else {
+                $el.html('<span class="lc-badge lc-badge--std">\u2600\uFE0F Standard hours \u2014 no extra charge</span>');
+>>>>>>> main
             }
             $el.html('<span class="lc-badge lc-badge--std">\u2600\uFE0F Standard hours \u2014 no extra charge</span>');
         }
