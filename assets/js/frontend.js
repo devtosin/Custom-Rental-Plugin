@@ -52,6 +52,15 @@
     }
 
     /* ─── OOH detection ──────────────────────────────────────────────────── */
+    function isSameDay(dateStr) {
+        if (!dateStr) return false;
+        var t = new Date();
+        var y = t.getFullYear();
+        var m = String(t.getMonth() + 1).padStart(2, '0');
+        var d = String(t.getDate()).padStart(2, '0');
+        return dateStr === (y + '-' + m + '-' + d);
+    }
+
     function isOOH(dateStr, timeStr) {
         if (!dateStr || !timeStr) return false;
         var dow  = new Date(dateStr + 'T12:00:00').getDay(); // 0=Sun 6=Sat
@@ -432,7 +441,7 @@
         });
 
         function refreshDelivBadge() {
-            renderTimeBadge($wrap.find('#lc-badge-deliv'), pickupDate, delivTime, PRICE.ooh_delivery);
+            renderTimeBadge($wrap.find('#lc-badge-deliv'), pickupDate, delivTime, PRICE.ooh_delivery, delivShowroomPickup, true, 'delivery');
         }
 
         function checkStep2() {
@@ -471,7 +480,7 @@
         });
 
         function refreshCollBadge() {
-            renderTimeBadge($wrap.find('#lc-badge-coll'), dropoffDate, collTime, PRICE.ooh_collection);
+            renderTimeBadge($wrap.find('#lc-badge-coll'), dropoffDate, collTime, PRICE.ooh_collection, collShowroomPickup, false, 'collection');
         }
 
         function refreshDurationHint() {
@@ -518,6 +527,7 @@
             var fBase  = legDeliveryBase + legCollectionBase;
             var fDOOH  = dOOH ? PRICE.ooh_delivery   : 0;
             var fCOOH  = cOOH ? PRICE.ooh_collection  : 0;
+            var fDSD   = (!dOOH && isSameDay(pickupDate) && delivShowroomPickup) ? PRICE.ooh_delivery : 0;
             var fDAP   = effDA ? (PRICE.airport[effDA] || 0) : 0;
             var fCAP   = effCA ? (PRICE.airport[effCA] || 0) : 0;
 
@@ -527,7 +537,11 @@
                 fCAP = fCAP / 2;
             }
 
+<<<<<<< codex/make-changes-to-the-plugin-vbq760
+            var totalFee = fBase + fDOOH + fCOOH + fDSD + fDAP + fCAP;
+=======
             var totalFee = fBase + fDOOH + fCOOH + fDAP + fCAP;
+>>>>>>> main
 
             $.post(lendocareData.ajax_url, {
                 action:       'lendocare_calculate_price',
@@ -546,6 +560,10 @@
 
                 if (fDOOH) appendSub($t, 'Out-of-hours extra charge (delivery)',   gbp(fDOOH));
                 if (fCOOH) appendSub($t, 'Out-of-hours extra charge (collection)', gbp(fCOOH));
+<<<<<<< codex/make-changes-to-the-plugin-vbq760
+                if (fDSD) appendSub($t, 'Same-day extra charge (delivery showroom)', gbp(fDSD));
+=======
+>>>>>>> main
 
                 if (fDAP) {
                     var dapLbl = ucfirst(effDA) + ' airport extra charge';
@@ -598,9 +616,18 @@
                 collectionAirportFee = collectionAirportFee / 2;
             }
 
+<<<<<<< codex/make-changes-to-the-plugin-vbq760
+            var deliverySameDayFee = (!dOOH && isSameDay(pickupDate) && delivShowroomPickup) ? PRICE.ooh_delivery : 0;
+
             var fee   = PRICE.base
                       + (dOOH ? PRICE.ooh_delivery   : 0)
                       + (cOOH ? PRICE.ooh_collection  : 0)
+                      + deliverySameDayFee
+=======
+            var fee   = PRICE.base
+                      + (dOOH ? PRICE.ooh_delivery   : 0)
+                      + (cOOH ? PRICE.ooh_collection  : 0)
+>>>>>>> main
                       + deliveryAirportFee
                       + collectionAirportFee;
 
@@ -657,13 +684,22 @@
         });
 
         /* ── Local helpers ──────────────────────────────────────────────────── */
-        function renderTimeBadge($el, dateStr, timeStr, oohFee) {
+        function renderTimeBadge($el, dateStr, timeStr, oohFee, showroomSelected, allowSameDayShowroomFee, legLabel) {
             if (!dateStr || !timeStr) { $el.html(''); return; }
             if (isOOH(dateStr, timeStr)) {
                 $el.html('<span class="lc-badge lc-badge--ooh">\uD83C\uDF19 Out-of-hours \u2014 +' + gbp(oohFee) + ' extra charge</span>');
+<<<<<<< codex/make-changes-to-the-plugin-vbq760
+                return;
+            }
+            if (allowSameDayShowroomFee && showroomSelected && isSameDay(dateStr)) {
+                $el.html('<span class="lc-badge lc-badge--ooh">\u26A1 Same-day ' + legLabel + ' from showroom \u2014 +' + gbp(oohFee) + ' extra charge</span>');
+                return;
+=======
             } else {
                 $el.html('<span class="lc-badge lc-badge--std">\u2600\uFE0F Standard hours \u2014 no extra charge</span>');
+>>>>>>> main
             }
+            $el.html('<span class="lc-badge lc-badge--std">\u2600\uFE0F Standard hours \u2014 no extra charge</span>');
         }
 
         function appendRow($t, label, valHtml) {

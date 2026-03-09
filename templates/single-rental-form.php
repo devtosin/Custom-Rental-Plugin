@@ -74,7 +74,7 @@ $time_options = '
                 <label class="lc-checkbox-label lc-showroom-toggle">
                     <input type="checkbox" id="lc-deliv-showroom" name="deliv_showroom" value="1">
                     <span class="lc-checkbox-box"></span>
-                    Delivery from our showroom (Unit 7, Firmdale Village, Ryan Dr, Brentford, TW8 9ZB)
+                    Collect from our showroom (Unit 7, Firmdale Village, Ryan Dr, Brentford, TW8 9ZB)
                 </label>
 
                 <div class="lc-question-row" id="lc-deliv-airport-question">
@@ -154,7 +154,13 @@ $time_options = '
                 </label>
 
                 <!-- Extra collection section — hidden by default (same-addr checked) -->
-                <div id="lc-coll-extra" style="display:none; margin-top:1rem;">
+                <div id="lc-coll-extra" class="lc-coll-extra" style="display:none;">
+
+                    <label class="lc-checkbox-label lc-showroom-toggle">
+                        <input type="checkbox" id="lc-collect-showroom" name="collect_showroom" value="1">
+                        <span class="lc-checkbox-box"></span>
+                        Collection from our showroom (Unit 7, Firmdale Village, Ryan Dr, Brentford, TW8 9ZB)
+                    </label>
 
                     <label class="lc-checkbox-label lc-showroom-toggle" style="margin-bottom:0.75rem;">
                         <input type="checkbox" id="lc-collect-showroom" name="collect_showroom" value="1">
@@ -242,9 +248,9 @@ $time_options = '
                     <select id="lc-deliv-time" name="delivery_time" class="lc-select">
                         <?php echo $time_options; ?>
                     </select>
-                    <div class="lc-time-badge" id="lc-badge-deliv"></div>
                 </div>
             </div>
+            <div class="lc-time-badge" id="lc-badge-deliv"></div>
         </div><!-- /step 2 -->
 
         <!-- ════════════════════════════════════════════════════════
@@ -266,9 +272,9 @@ $time_options = '
                     <select id="lc-coll-time" name="collection_time" class="lc-select">
                         <?php echo $time_options; ?>
                     </select>
-                    <div class="lc-time-badge" id="lc-badge-coll"></div>
                 </div>
             </div>
+            <div class="lc-time-badge" id="lc-badge-coll"></div>
             <div id="lc-duration-hint" class="lc-duration-hint" aria-live="polite"></div>
         </div><!-- /step 3 -->
 
