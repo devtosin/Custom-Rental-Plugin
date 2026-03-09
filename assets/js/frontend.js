@@ -4,6 +4,9 @@
     'use strict';
 
     /* ─── Bank Holidays England & Wales ──────────────────────────────────── */
+    var SHOWROOM_ADDRESS = 'Unit 7, Firmdale Village, Ryan Dr, Brentford, TW8 9ZB';
+    var SHOWROOM_POSTCODE = 'TW8 9ZB';
+
     var BANK_HOLIDAYS = [
         '2025-01-01','2025-04-18','2025-04-21','2025-05-05','2025-05-26',
         '2025-08-25','2025-12-25','2025-12-26',
@@ -16,13 +19,13 @@
     /* ─── Pricing ─────────────────────────────────────────────────────────── */
     var PRICE = {
         base:           100,  // £50 delivery + £50 collection
-        ooh_delivery:    65,  // surcharge per OOH delivery leg
-        ooh_collection:  65,  // surcharge per OOH collection leg
+        ooh_delivery:    65,  // extra charge per OOH delivery leg
+        ooh_collection:  65,  // extra charge per OOH collection leg
         airport: {
             heathrow: 35,     // £17.50 each way
             stansted: 40,     // £20 each way
             luton:    57,     // £28.50 each way
-            gatwick: 57      // £28.50 each way
+            gatwick: 118     // £59 each way / £118 both legs
         }
     };
 
@@ -245,9 +248,10 @@
         /* ── Per-leg address state ──────────────────────────────────────────── */
         var sameAddr      = true;
 
-        var delivIsAirport = false;
-        var delivAirport   = '';
-        var delivAddrOk    = false;   // true when address OR airport confirmed
+        var delivIsAirport      = false;
+        var delivAirport        = '';
+        var delivShowroomPickup = false;
+        var delivAddrOk         = false;   // true when address OR airport/showroom confirmed
 
         var collIsAirport      = false;
         var collAirport        = '';
@@ -273,12 +277,36 @@
             onFail: function () { collAddrOk = false; checkStep1(); }
         });
 
+
+        $wrap.find('#lc-deliv-showroom').on('change', function () {
+            delivShowroomPickup = $(this).is(':checked');
+            if (delivShowroomPickup) {
+                delivAddrOk = true;
+                delivIsAirport = false;
+                delivAirport = '';
+                $wrap.find('[name="deliv_is_airport"][value="no"]').prop('checked', true);
+                $wrap.find('[name="deliv_airport_name"]').prop('checked', false);
+                $wrap.find('#lc-hidden-deliv-airport').val('none');
+                $wrap.find('#lc-deliv-airport-ok').hide();
+                $wrap.find('#lc-deliv-airport-question').hide();
+                $wrap.find('#lc-deliv-airport-picker').hide();
+                $wrap.find('#lc-deliv-addr-search').hide();
+            } else {
+                $wrap.find('#lc-deliv-airport-question').show();
+                $wrap.find('#lc-deliv-addr-search').show();
+                delivAddrOk = false;
+            }
+            checkStep1();
+        });
+
         /* ── Delivery: airport yes/no ───────────────────────────────────────── */
         $wrap.find('[name="deliv_is_airport"]').on('change', function () {
             delivIsAirport = $(this).val() === 'yes';
             $wrap.find('#lc-deliv-airport-picker').toggle(delivIsAirport);
             $wrap.find('#lc-deliv-addr-search').toggle(!delivIsAirport);
             // Reset previous airport/address selection
+            delivShowroomPickup = false;
+            $wrap.find('#lc-deliv-showroom').prop('checked', false);
             delivAirport = '';
             delivAddrOk  = false;
             $wrap.find('#lc-hidden-deliv-airport').val('none');
@@ -301,6 +329,7 @@
             $wrap.find('#lc-coll-extra').slideToggle(200);
             if (sameAddr) {
                 collAddrOk = true;  // no extra collection validation needed
+                collShowroomPickup = delivShowroomPickup;
             } else {
                 collAddrOk    = false;
                 collIsAirport = false;
@@ -308,6 +337,7 @@
                 collShowroomPickup = false;
                 $wrap.find('#lc-collect-showroom').prop('checked', false);
                 $wrap.find('[name="coll_is_airport"][value="no"]').prop('checked', true);
+                $wrap.find('#lc-coll-airport-question').show();
                 $wrap.find('#lc-coll-airport-picker').hide();
                 $wrap.find('#lc-coll-addr-search').show();
                 $wrap.find('#lc-hidden-coll-airport').val('none');
@@ -343,11 +373,13 @@
                 collIsAirport = false;
                 collAirport = '';
                 $wrap.find('[name="coll_is_airport"][value="no"]').prop('checked', true);
+                $wrap.find('#lc-coll-airport-question').hide();
                 $wrap.find('#lc-coll-airport-picker').hide();
                 $wrap.find('#lc-coll-addr-search').hide();
                 $wrap.find('[name="coll_airport_name"]').prop('checked', false);
                 $wrap.find('#lc-hidden-coll-airport').val('none');
             } else {
+                $wrap.find('#lc-coll-airport-question').show();
                 $wrap.find('#lc-coll-addr-search').show();
                 collAddrOk = false;
             }
@@ -357,13 +389,11 @@
         /* ── Step 1 gate ────────────────────────────────────────────────────── */
         function checkStep1() {
             var ok = delivAddrOk && (sameAddr || collAddrOk);
-            $wrap.find('#lc-btn-step1').prop('disabled', !ok);
+            if (!ok) {
+                $wrap.find('#lc-step-4').addClass('lc-step--locked');
+                $wrap.find('#lc-actions').hide();
+            }
         }
-
-        $wrap.find('#lc-btn-step1').on('click', function () {
-            $wrap.find('#lc-step-2').removeClass('lc-step--locked');
-            scrollTo($wrap.find('#lc-step-2'));
-        });
 
         /* ── Step 2: Delivery date + time ───────────────────────────────────── */
         var pickupDate = '', delivTime = '', dropoffDate = '', collTime = '';
@@ -388,7 +418,6 @@
                 dropoffDate = ''; collTime = '';
                 $wrap.find('#lc-coll-time').val('');
                 $wrap.find('#lc-badge-coll').html('');
-                $wrap.find('#lc-step-3').addClass('lc-step--locked');
                 $wrap.find('#lc-step-4').addClass('lc-step--locked');
                 $wrap.find('#lc-actions').hide();
                 refreshDelivBadge();
@@ -407,17 +436,16 @@
         }
 
         function checkStep2() {
-            var ready = !!(pickupDate && delivTime);
-            $wrap.find('#lc-btn-step2').prop('disabled', !ready);
-            if (ready) {
-                $wrap.find('#lc-step-3').removeClass('lc-step--locked');
+            if (pickupDate && !delivTime) {
+                var delivTimeEl = $wrap.find('#lc-deliv-time')[0];
+                if (delivTimeEl) {
+                    delivTimeEl.focus();
+                    if (typeof delivTimeEl.showPicker === 'function') {
+                        delivTimeEl.showPicker();
+                    }
+                }
             }
         }
-
-        $wrap.find('#lc-btn-step2').on('click', function () {
-            $wrap.find('#lc-step-3').removeClass('lc-step--locked');
-            scrollTo($wrap.find('#lc-step-3'));
-        });
 
         /* ── Step 3: Collection date + time ─────────────────────────────────── */
         returnFP = flatpickr($wrap.find('#lc-dropoff-date')[0], {
@@ -427,6 +455,9 @@
             altFormat:  'D, d M Y',
             onChange: function (sel, ds) {
                 dropoffDate = ds;
+                if (dropoffDate && !collTime) {
+                    $wrap.find('#lc-coll-time').focus();
+                }
                 refreshCollBadge();
                 refreshDurationHint();
                 checkStep3();
@@ -463,7 +494,6 @@
         function checkStep3() {
             var days = dropoffDate ? daysBetween(pickupDate, dropoffDate) : 0;
             var ready = !!(dropoffDate && collTime && days > 0);
-            $wrap.find('#lc-btn-step3').prop('disabled', !ready);
             if (ready) {
                 buildSummary(function () {
                     $wrap.find('#lc-step-4').removeClass('lc-step--locked');
@@ -472,13 +502,6 @@
             }
         }
 
-        $wrap.find('#lc-btn-step3').on('click', function () {
-            buildSummary(function () {
-                $wrap.find('#lc-step-4').removeClass('lc-step--locked');
-                $wrap.find('#lc-actions').fadeIn(200);
-                scrollTo($wrap.find('#lc-step-4'));
-            });
-        });
 
         /* ── Price summary ──────────────────────────────────────────────────── */
         function buildSummary(done) {
@@ -583,9 +606,9 @@
 
             var delivLabel = delivIsAirport
                 ? ucfirst(delivAirport) + ' Airport'
-                : (delivState.label || $wrap.find('#lc-input-delivery').val());
+                : (delivShowroomPickup ? SHOWROOM_ADDRESS : (delivState.label || $wrap.find('#lc-input-delivery').val()));
             var collLabel  = sameAddr ? delivLabel
-                : (collShowroomPickup ? 'Unit 7, Firmdale Village, Ryan Dr, Brentford, TW8 9ZB'
+                : (collShowroomPickup ? SHOWROOM_ADDRESS
                 : (collIsAirport ? ucfirst(collAirport) + ' Airport'
                                  : (collState.label || $wrap.find('#lc-input-collection').val())));
 
@@ -601,7 +624,7 @@
                 product_id:         productId,
                 pickup_date:        pickupDate,
                 dropoff_date:       dropoffDate,
-                postcode:           delivIsAirport ? 'AIRPORT' : delivState.postcode,
+                postcode:           delivIsAirport ? 'AIRPORT' : (delivShowroomPickup ? SHOWROOM_POSTCODE : delivState.postcode),
                 delivery_address:   delivLabel,
                 collection_address: collLabel,
                 same_address:       sameAddr ? '1' : '0',
