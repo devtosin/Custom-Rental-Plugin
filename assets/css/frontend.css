@@ -3,7 +3,7 @@
 /* ── Wrapper ──────────────────────────────────────────────────────────────── */
 .lendocare-booking-form-wrap {
     font-family: inherit;
-    max-width: 580px;
+    max-width: 680px;
     margin: 1.5rem 0;
 }
 
@@ -18,7 +18,7 @@
     background: #fff;
     border: 1.5px solid #e5e7eb;
     border-radius: 12px;
-    padding: 1.4rem 1.5rem;
+    padding: 1.1rem 1.2rem;
     margin-bottom: 1rem;
     transition: opacity 0.22s, filter 0.22s;
 }
@@ -31,7 +31,7 @@
     display: flex;
     align-items: center;
     gap: 0.7rem;
-    margin-bottom: 1.3rem;
+    margin-bottom: 0.9rem;
 }
 .lc-step-num {
     display: inline-flex;
@@ -49,6 +49,18 @@
 .lc-step-title { font-size: 1rem; font-weight: 700; color: #111; }
 .lc-step-foot  { margin-top: 1.3rem; }
 
+.lc-showroom-toggle {
+    display: flex !important;
+    width: 100%;
+    padding: 0.55rem 0.65rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fff;
+    margin-bottom: 0.55rem !important;
+    line-height: 1.35;
+}
+
+
 /* ── Address block ────────────────────────────────────────────────────────── */
 .lc-addr-block + .lc-addr-block { margin-top: 0; }
 .lc-block-label {
@@ -64,6 +76,20 @@
 .lc-icon       { font-size: 1rem; }
 .lc-label-sub  { font-size: 0.78rem; font-weight: 400; color: #888; }
 .lc-divider    { border: none; border-top: 1px dashed #e5e7eb; margin: 1.2rem 0; }
+
+#lc-deliv-block,
+#lc-coll-block {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.9rem;
+}
+
+.lc-coll-extra {
+    margin-top: 0.9rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid #e5e7eb;
+}
 
 /* ── Yes/No airport question ─────────────────────────────────────────────── */
 .lc-question-row {
@@ -118,6 +144,8 @@
 .lc-ap-pill input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
 .lc-ap-pill span {
     display: inline-flex;
+    width: 100%;
+    justify-content: center;
     flex-direction: column;
     align-items: center;
     padding: 0.5rem 1.1rem;
@@ -300,7 +328,7 @@
 .lc-dt-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: 0.75rem;
 }
 @media (max-width: 480px) { .lc-dt-row { grid-template-columns: 1fr; } }
 
@@ -337,9 +365,11 @@
 }
 
 /* ── Time badge ───────────────────────────────────────────────────────────── */
-.lc-time-badge { margin-top: 0.5rem; min-height: 1.6em; }
+.lc-time-badge { margin-top: 0.6rem; min-height: 1.6em; grid-column: 1 / -1; }
 .lc-badge {
     display: inline-flex;
+    width: 100%;
+    justify-content: center;
     align-items: center;
     gap: 0.3rem;
     padding: 0.3rem 0.75rem;

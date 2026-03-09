@@ -4,6 +4,9 @@
     'use strict';
 
     /* ─── Bank Holidays England & Wales ──────────────────────────────────── */
+    var SHOWROOM_ADDRESS = 'Unit 7, Firmdale Village, Ryan Dr, Brentford, TW8 9ZB';
+    var SHOWROOM_POSTCODE = 'TW8 9ZB';
+
     var BANK_HOLIDAYS = [
         '2025-01-01','2025-04-18','2025-04-21','2025-05-05','2025-05-26',
         '2025-08-25','2025-12-25','2025-12-26',
@@ -16,12 +19,13 @@
     /* ─── Pricing ─────────────────────────────────────────────────────────── */
     var PRICE = {
         base:           100,  // £50 delivery + £50 collection
-        ooh_delivery:    65,  // surcharge per OOH delivery leg
-        ooh_collection:  65,  // surcharge per OOH collection leg
+        ooh_delivery:    65,  // extra charge per OOH delivery leg
+        ooh_collection:  65,  // extra charge per OOH collection leg
         airport: {
             heathrow: 35,     // £17.50 each way
             stansted: 40,     // £20 each way
-            luton:    57      // £28.50 each way
+            luton:    57,     // £28.50 each way
+            gatwick: 118     // £59 each way / £118 both legs
         }
     };
 
@@ -48,6 +52,15 @@
     }
 
     /* ─── OOH detection ──────────────────────────────────────────────────── */
+    function isSameDay(dateStr) {
+        if (!dateStr) return false;
+        var t = new Date();
+        var y = t.getFullYear();
+        var m = String(t.getMonth() + 1).padStart(2, '0');
+        var d = String(t.getDate()).padStart(2, '0');
+        return dateStr === (y + '-' + m + '-' + d);
+    }
+
     function isOOH(dateStr, timeStr) {
         if (!dateStr || !timeStr) return false;
         var dow  = new Date(dateStr + 'T12:00:00').getDay(); // 0=Sun 6=Sat
@@ -244,13 +257,15 @@
         /* ── Per-leg address state ──────────────────────────────────────────── */
         var sameAddr      = true;
 
-        var delivIsAirport = false;
-        var delivAirport   = '';      // 'heathrow' | 'stansted' | 'luton'
-        var delivAddrOk    = false;   // true when address OR airport confirmed
+        var delivIsAirport      = false;
+        var delivAirport        = '';
+        var delivShowroomPickup = false;
+        var delivAddrOk         = false;   // true when address OR airport/showroom confirmed
 
-        var collIsAirport  = false;
-        var collAirport    = '';
-        var collAddrOk     = true;    // starts true because same-addr is checked
+        var collIsAirport      = false;
+        var collAirport        = '';
+        var collShowroomPickup = false;
+        var collAddrOk         = true;    // starts true because same-addr is checked
 
         /* ── Address widgets ────────────────────────────────────────────────── */
         var delivState = addressWidget({
@@ -271,12 +286,36 @@
             onFail: function () { collAddrOk = false; checkStep1(); }
         });
 
+
+        $wrap.find('#lc-deliv-showroom').on('change', function () {
+            delivShowroomPickup = $(this).is(':checked');
+            if (delivShowroomPickup) {
+                delivAddrOk = true;
+                delivIsAirport = false;
+                delivAirport = '';
+                $wrap.find('[name="deliv_is_airport"][value="no"]').prop('checked', true);
+                $wrap.find('[name="deliv_airport_name"]').prop('checked', false);
+                $wrap.find('#lc-hidden-deliv-airport').val('none');
+                $wrap.find('#lc-deliv-airport-ok').hide();
+                $wrap.find('#lc-deliv-airport-question').hide();
+                $wrap.find('#lc-deliv-airport-picker').hide();
+                $wrap.find('#lc-deliv-addr-search').hide();
+            } else {
+                $wrap.find('#lc-deliv-airport-question').show();
+                $wrap.find('#lc-deliv-addr-search').show();
+                delivAddrOk = false;
+            }
+            checkStep1();
+        });
+
         /* ── Delivery: airport yes/no ───────────────────────────────────────── */
         $wrap.find('[name="deliv_is_airport"]').on('change', function () {
             delivIsAirport = $(this).val() === 'yes';
             $wrap.find('#lc-deliv-airport-picker').toggle(delivIsAirport);
             $wrap.find('#lc-deliv-addr-search').toggle(!delivIsAirport);
             // Reset previous airport/address selection
+            delivShowroomPickup = false;
+            $wrap.find('#lc-deliv-showroom').prop('checked', false);
             delivAirport = '';
             delivAddrOk  = false;
             $wrap.find('#lc-hidden-deliv-airport').val('none');
@@ -299,11 +338,15 @@
             $wrap.find('#lc-coll-extra').slideToggle(200);
             if (sameAddr) {
                 collAddrOk = true;  // no extra collection validation needed
+                collShowroomPickup = delivShowroomPickup;
             } else {
                 collAddrOk    = false;
                 collIsAirport = false;
                 collAirport   = '';
+                collShowroomPickup = false;
+                $wrap.find('#lc-collect-showroom').prop('checked', false);
                 $wrap.find('[name="coll_is_airport"][value="no"]').prop('checked', true);
+                $wrap.find('#lc-coll-airport-question').show();
                 $wrap.find('#lc-coll-airport-picker').hide();
                 $wrap.find('#lc-coll-addr-search').show();
                 $wrap.find('#lc-hidden-coll-airport').val('none');
@@ -332,16 +375,34 @@
             checkStep1();
         });
 
+        $wrap.find('#lc-collect-showroom').on('change', function () {
+            collShowroomPickup = $(this).is(':checked');
+            if (collShowroomPickup) {
+                collAddrOk = true;
+                collIsAirport = false;
+                collAirport = '';
+                $wrap.find('[name="coll_is_airport"][value="no"]').prop('checked', true);
+                $wrap.find('#lc-coll-airport-question').hide();
+                $wrap.find('#lc-coll-airport-picker').hide();
+                $wrap.find('#lc-coll-addr-search').hide();
+                $wrap.find('[name="coll_airport_name"]').prop('checked', false);
+                $wrap.find('#lc-hidden-coll-airport').val('none');
+            } else {
+                $wrap.find('#lc-coll-airport-question').show();
+                $wrap.find('#lc-coll-addr-search').show();
+                collAddrOk = false;
+            }
+            checkStep1();
+        });
+
         /* ── Step 1 gate ────────────────────────────────────────────────────── */
         function checkStep1() {
             var ok = delivAddrOk && (sameAddr || collAddrOk);
-            $wrap.find('#lc-btn-step1').prop('disabled', !ok);
+            if (!ok) {
+                $wrap.find('#lc-step-4').addClass('lc-step--locked');
+                $wrap.find('#lc-actions').hide();
+            }
         }
-
-        $wrap.find('#lc-btn-step1').on('click', function () {
-            $wrap.find('#lc-step-2').removeClass('lc-step--locked');
-            scrollTo($wrap.find('#lc-step-2'));
-        });
 
         /* ── Step 2: Delivery date + time ───────────────────────────────────── */
         var pickupDate = '', delivTime = '', dropoffDate = '', collTime = '';
@@ -366,7 +427,6 @@
                 dropoffDate = ''; collTime = '';
                 $wrap.find('#lc-coll-time').val('');
                 $wrap.find('#lc-badge-coll').html('');
-                $wrap.find('#lc-step-3').addClass('lc-step--locked');
                 $wrap.find('#lc-step-4').addClass('lc-step--locked');
                 $wrap.find('#lc-actions').hide();
                 refreshDelivBadge();
@@ -381,17 +441,20 @@
         });
 
         function refreshDelivBadge() {
-            renderTimeBadge($wrap.find('#lc-badge-deliv'), pickupDate, delivTime, PRICE.ooh_delivery);
+            renderTimeBadge($wrap.find('#lc-badge-deliv'), pickupDate, delivTime, PRICE.ooh_delivery, delivShowroomPickup, true, 'delivery');
         }
 
         function checkStep2() {
-            $wrap.find('#lc-btn-step2').prop('disabled', !(pickupDate && delivTime));
+            if (pickupDate && !delivTime) {
+                var delivTimeEl = $wrap.find('#lc-deliv-time')[0];
+                if (delivTimeEl) {
+                    delivTimeEl.focus();
+                    if (typeof delivTimeEl.showPicker === 'function') {
+                        delivTimeEl.showPicker();
+                    }
+                }
+            }
         }
-
-        $wrap.find('#lc-btn-step2').on('click', function () {
-            $wrap.find('#lc-step-3').removeClass('lc-step--locked');
-            scrollTo($wrap.find('#lc-step-3'));
-        });
 
         /* ── Step 3: Collection date + time ─────────────────────────────────── */
         returnFP = flatpickr($wrap.find('#lc-dropoff-date')[0], {
@@ -401,6 +464,9 @@
             altFormat:  'D, d M Y',
             onChange: function (sel, ds) {
                 dropoffDate = ds;
+                if (dropoffDate && !collTime) {
+                    $wrap.find('#lc-coll-time').focus();
+                }
                 refreshCollBadge();
                 refreshDurationHint();
                 checkStep3();
@@ -414,7 +480,7 @@
         });
 
         function refreshCollBadge() {
-            renderTimeBadge($wrap.find('#lc-badge-coll'), dropoffDate, collTime, PRICE.ooh_collection);
+            renderTimeBadge($wrap.find('#lc-badge-coll'), dropoffDate, collTime, PRICE.ooh_collection, collShowroomPickup, false, 'collection');
         }
 
         function refreshDurationHint() {
@@ -436,16 +502,15 @@
 
         function checkStep3() {
             var days = dropoffDate ? daysBetween(pickupDate, dropoffDate) : 0;
-            $wrap.find('#lc-btn-step3').prop('disabled', !(dropoffDate && collTime && days > 0));
+            var ready = !!(dropoffDate && collTime && days > 0);
+            if (ready) {
+                buildSummary(function () {
+                    $wrap.find('#lc-step-4').removeClass('lc-step--locked');
+                    $wrap.find('#lc-actions').fadeIn(200);
+                });
+            }
         }
 
-        $wrap.find('#lc-btn-step3').on('click', function () {
-            buildSummary(function () {
-                $wrap.find('#lc-step-4').removeClass('lc-step--locked');
-                $wrap.find('#lc-actions').fadeIn(200);
-                scrollTo($wrap.find('#lc-step-4'));
-            });
-        });
 
         /* ── Price summary ──────────────────────────────────────────────────── */
         function buildSummary(done) {
@@ -457,12 +522,22 @@
             var effDA = delivIsAirport ? delivAirport : '';
             var effCA = sameAddr ? effDA : (collIsAirport ? collAirport : '');
 
-            var fBase  = PRICE.base;
+            var legDeliveryBase   = 50;
+            var legCollectionBase = 50;
+            var fBase  = legDeliveryBase + legCollectionBase;
             var fDOOH  = dOOH ? PRICE.ooh_delivery   : 0;
             var fCOOH  = cOOH ? PRICE.ooh_collection  : 0;
+            var fDSD   = (!dOOH && isSameDay(pickupDate) && delivShowroomPickup) ? PRICE.ooh_delivery : 0;
             var fDAP   = effDA ? (PRICE.airport[effDA] || 0) : 0;
             var fCAP   = effCA ? (PRICE.airport[effCA] || 0) : 0;
-            var totalFee = fBase + fDOOH + fCOOH + fDAP + fCAP;
+
+            if (effDA && !effCA) {
+                fDAP = fDAP / 2;
+            } else if (!effDA && effCA) {
+                fCAP = fCAP / 2;
+            }
+
+            var totalFee = fBase + fDOOH + fCOOH + fDSD + fDAP + fCAP;
 
             $.post(lendocareData.ajax_url, {
                 action:       'lendocare_calculate_price',
@@ -479,16 +554,17 @@
                 appendRow($t, 'Rental charge', d.rental_price_f + ' <small>(' + d.billing_unit + ')</small>');
                 appendRow($t, 'Base delivery & collection', gbp(fBase));
 
-                if (fDOOH) appendSub($t, 'Out-of-hours surcharge (delivery)',   gbp(fDOOH));
-                if (fCOOH) appendSub($t, 'Out-of-hours surcharge (collection)', gbp(fCOOH));
+                if (fDOOH) appendSub($t, 'Out-of-hours extra charge (delivery)',   gbp(fDOOH));
+                if (fCOOH) appendSub($t, 'Out-of-hours extra charge (collection)', gbp(fCOOH));
+                if (fDSD) appendSub($t, 'Same-day extra charge (delivery showroom)', gbp(fDSD));
 
                 if (fDAP) {
-                    var dapLbl = ucfirst(effDA) + ' airport surcharge';
+                    var dapLbl = ucfirst(effDA) + ' airport extra charge';
                     dapLbl += sameAddr ? ' (delivery + collection)' : ' (delivery)';
                     appendSub($t, dapLbl, gbp(fDAP));
                 }
                 if (fCAP && !sameAddr) {
-                    appendSub($t, ucfirst(effCA) + ' airport surcharge (collection)', gbp(fCAP));
+                    appendSub($t, ucfirst(effCA) + ' airport extra charge (collection)', gbp(fCAP));
                 }
 
                 if (d.deposit > 0) appendRow($t, 'Security deposit (refundable)', d.deposit_f);
@@ -524,18 +600,31 @@
             var cOOH  = isOOH(dropoffDate, collTime);
             var effDA = delivIsAirport ? delivAirport : '';
             var effCA = sameAddr ? effDA : (collIsAirport ? collAirport : '');
+
+            var deliveryAirportFee   = effDA ? (PRICE.airport[effDA] || 0) : 0;
+            var collectionAirportFee = effCA ? (PRICE.airport[effCA] || 0) : 0;
+            if (effDA && !effCA) {
+                deliveryAirportFee = deliveryAirportFee / 2;
+            } else if (!effDA && effCA) {
+                collectionAirportFee = collectionAirportFee / 2;
+            }
+
+            var deliverySameDayFee = (!dOOH && isSameDay(pickupDate) && delivShowroomPickup) ? PRICE.ooh_delivery : 0;
+
             var fee   = PRICE.base
                       + (dOOH ? PRICE.ooh_delivery   : 0)
                       + (cOOH ? PRICE.ooh_collection  : 0)
-                      + (effDA ? (PRICE.airport[effDA] || 0) : 0)
-                      + (effCA ? (PRICE.airport[effCA] || 0) : 0);
+                      + deliverySameDayFee
+                      + deliveryAirportFee
+                      + collectionAirportFee;
 
             var delivLabel = delivIsAirport
                 ? ucfirst(delivAirport) + ' Airport'
-                : (delivState.label || $wrap.find('#lc-input-delivery').val());
+                : (delivShowroomPickup ? SHOWROOM_ADDRESS : (delivState.label || $wrap.find('#lc-input-delivery').val()));
             var collLabel  = sameAddr ? delivLabel
+                : (collShowroomPickup ? SHOWROOM_ADDRESS
                 : (collIsAirport ? ucfirst(collAirport) + ' Airport'
-                                 : (collState.label || $wrap.find('#lc-input-collection').val()));
+                                 : (collState.label || $wrap.find('#lc-input-collection').val())));
 
             var $btn = $wrap.find('.lc-btn-book');
             $btn.prop('disabled', true);
@@ -549,7 +638,7 @@
                 product_id:         productId,
                 pickup_date:        pickupDate,
                 dropoff_date:       dropoffDate,
-                postcode:           delivIsAirport ? 'AIRPORT' : delivState.postcode,
+                postcode:           delivIsAirport ? 'AIRPORT' : (delivShowroomPickup ? SHOWROOM_POSTCODE : delivState.postcode),
                 delivery_address:   delivLabel,
                 collection_address: collLabel,
                 same_address:       sameAddr ? '1' : '0',
@@ -582,13 +671,17 @@
         });
 
         /* ── Local helpers ──────────────────────────────────────────────────── */
-        function renderTimeBadge($el, dateStr, timeStr, oohFee) {
+        function renderTimeBadge($el, dateStr, timeStr, oohFee, showroomSelected, allowSameDayShowroomFee, legLabel) {
             if (!dateStr || !timeStr) { $el.html(''); return; }
             if (isOOH(dateStr, timeStr)) {
-                $el.html('<span class="lc-badge lc-badge--ooh">\uD83C\uDF19 Out-of-hours \u2014 +' + gbp(oohFee) + ' surcharge</span>');
-            } else {
-                $el.html('<span class="lc-badge lc-badge--std">\u2600\uFE0F Standard hours \u2014 no surcharge</span>');
+                $el.html('<span class="lc-badge lc-badge--ooh">\uD83C\uDF19 Out-of-hours \u2014 +' + gbp(oohFee) + ' extra charge</span>');
+                return;
             }
+            if (allowSameDayShowroomFee && showroomSelected && isSameDay(dateStr)) {
+                $el.html('<span class="lc-badge lc-badge--ooh">\u26A1 Same-day ' + legLabel + ' from showroom \u2014 +' + gbp(oohFee) + ' extra charge</span>');
+                return;
+            }
+            $el.html('<span class="lc-badge lc-badge--std">\u2600\uFE0F Standard hours \u2014 no extra charge</span>');
         }
 
         function appendRow($t, label, valHtml) {
