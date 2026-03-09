@@ -1,0 +1,446 @@
+/* Custom Rental – Tosin | Frontend Styles */
+
+/* ── Wrapper ──────────────────────────────────────────────────────────────── */
+.lendocare-booking-form-wrap {
+    font-family: inherit;
+    max-width: 580px;
+    margin: 1.5rem 0;
+}
+
+/* ── Headline price ───────────────────────────────────────────────────────── */
+.lc-headline-price  { margin-bottom: 1.5rem; }
+.lc-price-display   { font-size: 1.75rem; font-weight: 700; color: #111; }
+.lc-per-unit        { font-size: 1rem; font-weight: 400; color: #666; }
+.lc-pricing-note    { display: block; font-size: 0.8rem; color: #888; margin-top: 0.25rem; }
+
+/* ── Steps ────────────────────────────────────────────────────────────────── */
+.lc-step {
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.4rem 1.5rem;
+    margin-bottom: 1rem;
+    transition: opacity 0.22s, filter 0.22s;
+}
+.lc-step--locked {
+    opacity: 0.3;
+    pointer-events: none;
+    filter: grayscale(0.4);
+}
+.lc-step-header {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 1.3rem;
+}
+.lc-step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    background: #1a73e8;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.lc-step-title { font-size: 1rem; font-weight: 700; color: #111; }
+.lc-step-foot  { margin-top: 1.3rem; }
+
+/* ── Address block ────────────────────────────────────────────────────────── */
+.lc-addr-block + .lc-addr-block { margin-top: 0; }
+.lc-block-label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #222;
+    margin: 0 0 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+.lc-icon       { font-size: 1rem; }
+.lc-label-sub  { font-size: 0.78rem; font-weight: 400; color: #888; }
+.lc-divider    { border: none; border-top: 1px dashed #e5e7eb; margin: 1.2rem 0; }
+
+/* ── Yes/No airport question ─────────────────────────────────────────────── */
+.lc-question-row {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+}
+.lc-question-text {
+    font-size: 0.88rem;
+    color: #333;
+    font-weight: 500;
+}
+.lc-yn-wrap { display: flex; gap: 0.4rem; }
+.lc-yn-pill { display: inline-flex; }
+.lc-yn-pill input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+.lc-yn-pill span {
+    display: inline-block;
+    padding: 0.35rem 1rem;
+    border: 1.5px solid #d1d5db;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #444;
+    background: #f9fafb;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+}
+.lc-yn-pill input:checked + span {
+    background: #1a73e8;
+    color: #fff;
+    border-color: #1a73e8;
+}
+
+/* ── Airport picker ───────────────────────────────────────────────────────── */
+.lc-airport-picker {
+    background: #f0f7ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.5rem;
+}
+.lc-picker-hint {
+    font-size: 0.82rem;
+    color: #555;
+    margin: 0 0 0.6rem;
+}
+.lc-airport-pills { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.lc-ap-pill { display: inline-flex; }
+.lc-ap-pill input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+.lc-ap-pill span {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 1.1rem;
+    border: 1.5px solid #93c5fd;
+    border-radius: 9px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1e40af;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.15s;
+    line-height: 1.3;
+}
+.lc-ap-pill span em {
+    font-style: normal;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: #60a5fa;
+    margin-top: 0.1rem;
+}
+.lc-ap-pill input:checked + span {
+    background: #1a73e8;
+    color: #fff;
+    border-color: #1a73e8;
+}
+.lc-ap-pill input:checked + span em { color: #bfdbfe; }
+
+/* Airport confirmed feedback */
+.lc-airport-confirmed {
+    margin-top: 0.6rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #15803d;
+}
+
+/* ── Address search ───────────────────────────────────────────────────────── */
+.lc-search-hint {
+    font-size: 0.8rem;
+    color: #666;
+    margin: 0.5rem 0 0.5rem;
+}
+.lc-search-hint code {
+    background: #f3f4f6;
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-size: 0.78rem;
+}
+.lc-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.lc-text-input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.72rem 2.4rem 0.72rem 0.9rem;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: #fff;
+    color: #111;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.lc-text-input:focus {
+    outline: none;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 3px rgba(26,115,232,0.12);
+}
+
+/* Spinner */
+.lc-spinner {
+    position: absolute;
+    right: 0.75rem;
+    width: 1.1rem;
+    height: 1.1rem;
+    pointer-events: none;
+    flex-shrink: 0;
+}
+.lc-spinner.active::after {
+    content: '';
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #d1d5db;
+    border-top-color: #1a73e8;
+    border-radius: 50%;
+    animation: lc-spin 0.65s linear infinite;
+}
+@keyframes lc-spin { to { transform: rotate(360deg); } }
+
+/* Dropdown */
+.lc-addr-search { position: relative; }
+.lc-dropdown {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 3px);
+    z-index: 9999;
+    background: #fff;
+    list-style: none;
+    margin: 0;
+    padding: 0.3rem 0;
+    border: 1.5px solid #d1d5db;
+    border-radius: 9px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    max-height: 260px;
+    overflow-y: auto;
+}
+.lc-dd-item {
+    padding: 0.6rem 0.95rem;
+    font-size: 0.87rem;
+    color: #1a1a1a;
+    cursor: pointer;
+    line-height: 1.4;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background 0.1s;
+    outline: none;
+}
+.lc-dd-item:last-child { border-bottom: none; }
+.lc-dd-item:hover,
+.lc-dd-item:focus { background: #eff6ff; color: #1a73e8; }
+
+/* Feedback */
+.lc-addr-feedback {
+    font-size: 0.82rem;
+    font-weight: 500;
+    margin-top: 0.45rem;
+    min-height: 1.2em;
+    line-height: 1.4;
+}
+.lc-fb-ok  { color: #15803d; }
+.lc-fb-err { color: #b91c1c; }
+
+/* ── Checkbox (same address) ──────────────────────────────────────────────── */
+.lc-checkbox-label {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    color: #333 !important;
+    cursor: pointer !important;
+    margin: 0 !important;
+}
+.lc-checkbox-label input[type="checkbox"] {
+    position: absolute; opacity: 0; width: 0; height: 0;
+}
+.lc-checkbox-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border: 1.5px solid #bbb;
+    border-radius: 4px;
+    background: #fff;
+    transition: all 0.15s;
+}
+.lc-checkbox-label input:checked + .lc-checkbox-box {
+    background: #1a73e8;
+    border-color: #1a73e8;
+}
+.lc-checkbox-label input:checked + .lc-checkbox-box::after {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 9px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translateY(-1px);
+}
+
+/* ── Date/time row ────────────────────────────────────────────────────────── */
+.lc-dt-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+@media (max-width: 480px) { .lc-dt-row { grid-template-columns: 1fr; } }
+
+.lc-field { margin-bottom: 0; }
+.lc-field-label {
+    display: block;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.4rem;
+}
+.lc-select {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.72rem 2.4rem 0.72rem 0.9rem;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: #fff;
+    color: #111;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.85rem center;
+    cursor: pointer;
+}
+.lc-select:focus {
+    outline: none;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 3px rgba(26,115,232,0.12);
+}
+
+/* ── Time badge ───────────────────────────────────────────────────────────── */
+.lc-time-badge { margin-top: 0.5rem; min-height: 1.6em; }
+.lc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+.lc-badge--std { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+.lc-badge--ooh { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+
+/* ── Duration hint ────────────────────────────────────────────────────────── */
+.lc-duration-hint { font-size: 0.83rem; margin-top: 0.75rem; min-height: 1.2em; }
+.lc-hint-ok  { color: #15803d; font-weight: 600; }
+.lc-hint-err { color: #b91c1c; font-weight: 600; }
+
+/* ── Summary table ────────────────────────────────────────────────────────── */
+.lc-summary-table   { width: 100%; border-collapse: collapse; font-size: 0.93rem; }
+.lc-summary-table td { padding: 0.5rem 0; vertical-align: top; }
+.lc-sum-val  { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lc-sub-label { padding-left: 1rem; color: #555; font-size: 0.87rem; }
+.lc-sub-row .lc-sum-val { color: #555; font-size: 0.87rem; }
+.lc-row-total td { border-top: 1.5px solid #e5e7eb; padding-top: 0.9rem; font-size: 1.05rem; }
+.lc-billing-note { font-size: 0.78rem; color: #888; margin: 0.5rem 0 0; font-style: italic; }
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+.lc-btn {
+    display: inline-block;
+    padding: 0.7rem 1.3rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    transition: background 0.16s, opacity 0.16s;
+    line-height: 1.4;
+    text-align: center;
+}
+.lc-btn:disabled,
+.lc-btn[disabled] { opacity: 0.42; cursor: not-allowed; }
+
+.lc-btn-next { background: #1a73e8; color: #fff; }
+.lc-btn-next:not(:disabled):hover { background: #155db5; color: #fff; }
+
+.lc-btn-book {
+    width: 100%;
+    background: #16a34a;
+    color: #fff;
+    font-size: 1rem;
+    padding: 0.9rem;
+}
+.lc-btn-book:not(:disabled):hover { background: #15803d; }
+
+/* ── Actions ──────────────────────────────────────────────────────────────── */
+#lc-actions    { margin-top: 0.75rem; }
+.lc-policy-note { font-size: 0.78rem; color: #888; text-align: center; margin: 0.5rem 0 0; }
+
+/* ── Error ────────────────────────────────────────────────────────────────── */
+.lc-error-message {
+    display: none;
+    font-size: 0.88rem;
+    color: #b91c1c;
+    margin-top: 0.75rem;
+    padding: 0.6rem 0.95rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 7px;
+}
+
+/* ── Success ──────────────────────────────────────────────────────────────── */
+.lc-success-message {
+    background: #f0fdf4;
+    border: 1.5px solid #86efac;
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+}
+.lc-success-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: #22c55e;
+    color: #fff;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+.lc-success-message p {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #166534;
+    margin-bottom: 1.2rem;
+}
+.lc-success-buttons { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+.lc-btn-checkout { background: #1a73e8; color: #fff; }
+.lc-btn-cart     { background: #f1f5f9; color: #1a1a1a; border: 1px solid #e2e8f0; }
+
+/* ── Flatpickr ────────────────────────────────────────────────────────────── */
+.flatpickr-calendar {
+    border-radius: 10px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12) !important;
+}

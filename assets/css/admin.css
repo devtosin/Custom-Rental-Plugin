@@ -1,0 +1,9 @@
+/* LendoCare Admin Styles */
+#lendocare_rental_data h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1d2327;
+    margin: 1rem 0 0.5rem;
+    padding-left: 12px;
+    border-left: 3px solid #1a73e8;
+}
