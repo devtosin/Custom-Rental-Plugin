@@ -19,7 +19,7 @@ $deposit    = (float) $product->get_deposit_amount();
 /* Time <option> list — used for both delivery and collection selects */
 $time_options = '
 <option value="">— Select a time —</option>
-<optgroup label="Standard hours (Mon–Fri, 9 am–5 pm) — no surcharge">
+<optgroup label="Standard hours (Mon–Fri, 9 am–5 pm) — no extra charge">
   <option value="09:00">9:00 am</option>
   <option value="10:00">10:00 am</option>
   <option value="11:00">11:00 am</option>
@@ -29,7 +29,7 @@ $time_options = '
   <option value="15:00">3:00 pm</option>
   <option value="16:00">4:00 pm</option>
 </optgroup>
-<optgroup label="Out-of-hours (evenings / weekends / bank holidays) — +£65">
+<optgroup label="Out-of-hours (evenings / weekends / bank holidays) — +£65 extra charge">
   <option value="07:00">7:00 am</option>
   <option value="08:00">8:00 am</option>
   <option value="17:00">5:00 pm</option>
@@ -101,6 +101,10 @@ $time_options = '
                             <input type="radio" name="deliv_airport_name" value="luton">
                             <span>✈️ Luton<em>+£28.50</em></span>
                         </label>
+                        <label class="lc-ap-pill">
+                            <input type="radio" name="deliv_airport_name" value="gatwick">
+                            <span>✈️ Gatwick<em>+£28.50</em></span>
+                        </label>
                     </div>
                     <p class="lc-airport-confirmed" id="lc-deliv-airport-ok" style="display:none;">
                         ✓ Airport selected — we deliver there
@@ -146,6 +150,12 @@ $time_options = '
                 <!-- Extra collection section — hidden by default (same-addr checked) -->
                 <div id="lc-coll-extra" style="display:none; margin-top:1rem;">
 
+                    <label class="lc-checkbox-label" style="margin-bottom:0.75rem;">
+                        <input type="checkbox" id="lc-collect-showroom" name="collect_showroom" value="1">
+                        <span class="lc-checkbox-box"></span>
+                        Collection from our showroom (Unit 7, Firmdale Village, Ryan Dr, Brentford, TW8 9ZB)
+                    </label>
+
                     <!-- Q: Is it an airport? -->
                     <div class="lc-question-row">
                         <span class="lc-question-text">Is this collection from an airport?</span>
@@ -176,6 +186,10 @@ $time_options = '
                             <label class="lc-ap-pill">
                                 <input type="radio" name="coll_airport_name" value="luton">
                                 <span>✈️ Luton<em>+£28.50</em></span>
+                            </label>
+                            <label class="lc-ap-pill">
+                                <input type="radio" name="coll_airport_name" value="gatwick">
+                                <span>✈️ Gatwick<em>+£28.50</em></span>
                             </label>
                         </div>
                         <p class="lc-airport-confirmed" id="lc-coll-airport-ok" style="display:none;">
