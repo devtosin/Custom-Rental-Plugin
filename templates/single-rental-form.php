@@ -19,7 +19,7 @@ $deposit    = (float) $product->get_deposit_amount();
 /* Time <option> list — used for both delivery and collection selects */
 $time_options = '
 <option value="">— Select a time —</option>
-<optgroup label="Standard hours (Mon–Fri, 9 am–5 pm) — no surcharge">
+<optgroup label="Standard hours (Mon–Fri, 9 am–5 pm) — no extra charge">
   <option value="09:00">9:00 am</option>
   <option value="10:00">10:00 am</option>
   <option value="11:00">11:00 am</option>
@@ -29,7 +29,7 @@ $time_options = '
   <option value="15:00">3:00 pm</option>
   <option value="16:00">4:00 pm</option>
 </optgroup>
-<optgroup label="Out-of-hours (evenings / weekends / bank holidays) — +£65">
+<optgroup label="Out-of-hours (evenings / weekends / bank holidays) — +£65 extra charge">
   <option value="07:00">7:00 am</option>
   <option value="08:00">8:00 am</option>
   <option value="17:00">5:00 pm</option>
@@ -71,7 +71,13 @@ $time_options = '
                 </p>
 
                 <!-- Q: Is it an airport? -->
-                <div class="lc-question-row">
+                <label class="lc-checkbox-label lc-showroom-toggle">
+                    <input type="checkbox" id="lc-deliv-showroom" name="deliv_showroom" value="1">
+                    <span class="lc-checkbox-box"></span>
+                    Delivery from our showroom (Unit 7, Firmdale Village, Ryan Dr, Brentford, TW8 9ZB)
+                </label>
+
+                <div class="lc-question-row" id="lc-deliv-airport-question">
                     <span class="lc-question-text">Is this delivery to an airport?</span>
                     <div class="lc-yn-wrap">
                         <label class="lc-yn-pill">
@@ -100,6 +106,10 @@ $time_options = '
                         <label class="lc-ap-pill">
                             <input type="radio" name="deliv_airport_name" value="luton">
                             <span>✈️ Luton<em>+£28.50</em></span>
+                        </label>
+                        <label class="lc-ap-pill">
+                            <input type="radio" name="deliv_airport_name" value="gatwick">
+                            <span>✈️ Gatwick<em>+£59 each way</em></span>
                         </label>
                     </div>
                     <p class="lc-airport-confirmed" id="lc-deliv-airport-ok" style="display:none;">
@@ -146,8 +156,14 @@ $time_options = '
                 <!-- Extra collection section — hidden by default (same-addr checked) -->
                 <div id="lc-coll-extra" style="display:none; margin-top:1rem;">
 
+                    <label class="lc-checkbox-label lc-showroom-toggle" style="margin-bottom:0.75rem;">
+                        <input type="checkbox" id="lc-collect-showroom" name="collect_showroom" value="1">
+                        <span class="lc-checkbox-box"></span>
+                        Collection from our showroom (Unit 7, Firmdale Village, Ryan Dr, Brentford, TW8 9ZB)
+                    </label>
+
                     <!-- Q: Is it an airport? -->
-                    <div class="lc-question-row">
+                    <div class="lc-question-row" id="lc-coll-airport-question">
                         <span class="lc-question-text">Is this collection from an airport?</span>
                         <div class="lc-yn-wrap">
                             <label class="lc-yn-pill">
@@ -177,6 +193,10 @@ $time_options = '
                                 <input type="radio" name="coll_airport_name" value="luton">
                                 <span>✈️ Luton<em>+£28.50</em></span>
                             </label>
+                            <label class="lc-ap-pill">
+                                <input type="radio" name="coll_airport_name" value="gatwick">
+                                <span>✈️ Gatwick<em>+£59 each way</em></span>
+                            </label>
                         </div>
                         <p class="lc-airport-confirmed" id="lc-coll-airport-ok" style="display:none;">
                             ✓ Airport selected — we collect from there
@@ -201,18 +221,12 @@ $time_options = '
                     </div>
                 </div>
             </div><!-- /collection -->
-
-            <div class="lc-step-foot">
-                <button type="button" id="lc-btn-step1" class="lc-btn lc-btn-next" disabled>
-                    Continue: choose delivery date &amp; time →
-                </button>
-            </div>
         </div><!-- /step 1 -->
 
         <!-- ════════════════════════════════════════════════════════
              STEP 2 — Delivery date & time
         ════════════════════════════════════════════════════════ -->
-        <div class="lc-step lc-step--locked" id="lc-step-2">
+        <div class="lc-step" id="lc-step-2">
             <div class="lc-step-header">
                 <span class="lc-step-num">2</span>
                 <span class="lc-step-title">Delivery date &amp; time</span>
@@ -231,17 +245,12 @@ $time_options = '
                     <div class="lc-time-badge" id="lc-badge-deliv"></div>
                 </div>
             </div>
-            <div class="lc-step-foot">
-                <button type="button" id="lc-btn-step2" class="lc-btn lc-btn-next" disabled>
-                    Continue: choose collection date &amp; time →
-                </button>
-            </div>
         </div><!-- /step 2 -->
 
         <!-- ════════════════════════════════════════════════════════
              STEP 3 — Collection date & time
         ════════════════════════════════════════════════════════ -->
-        <div class="lc-step lc-step--locked" id="lc-step-3">
+        <div class="lc-step" id="lc-step-3">
             <div class="lc-step-header">
                 <span class="lc-step-num">3</span>
                 <span class="lc-step-title">Collection date &amp; time</span>
@@ -261,17 +270,12 @@ $time_options = '
                 </div>
             </div>
             <div id="lc-duration-hint" class="lc-duration-hint" aria-live="polite"></div>
-            <div class="lc-step-foot">
-                <button type="button" id="lc-btn-step3" class="lc-btn lc-btn-next" disabled>
-                    See price summary →
-                </button>
-            </div>
         </div><!-- /step 3 -->
 
         <!-- ════════════════════════════════════════════════════════
              STEP 4 — Price summary
         ════════════════════════════════════════════════════════ -->
-        <div class="lc-step lc-step--locked" id="lc-step-4">
+        <div class="lc-step" id="lc-step-4">
             <div class="lc-step-header">
                 <span class="lc-step-num">4</span>
                 <span class="lc-step-title">Your booking summary</span>
